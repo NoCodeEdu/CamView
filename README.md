@@ -61,7 +61,7 @@ Open the project (*CamView.csproj*) in Visual Studio. Select **"Tools"**, then *
     dotnet publish -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true
 
 Output location (the exe file): `bin > Release > net8.0-windows10.0.19041.0 > win-x64 > publish > CamView.exe`
-(single ~90 MB file, runs on any 64-bit Windows 10/11 with nothing installed).
+(single ~90 to 200 MB file, runs on any 64-bit Windows 10/11 with nothing installed).
 
 *Optional smaller exe file size: Use `--self-contained false` for a ~1 MB exe needing the .NET 8 Desktop Runtime.*
 
