@@ -1,0 +1,330 @@
+<Window x:Class="CamView.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="CamView" Width="820" Height="600"
+        Background="Transparent"
+        WindowStyle="None" AllowsTransparency="True" ResizeMode="CanResizeWithGrip"
+        Loaded="Window_Loaded" Closing="Window_Closing" Closed="Window_Closed"
+        PreviewKeyDown="Window_PreviewKeyDown">
+
+    <Window.Resources>
+        <SolidColorBrush x:Key="TextBrush"   Color="#D7D9DC"/>
+        <SolidColorBrush x:Key="DimBrush"    Color="#8A8F96"/>
+        <SolidColorBrush x:Key="AccentBrush" Color="#FFB454"/>
+        <SolidColorBrush x:Key="AccentInk"   Color="#1A1206"/>
+        <SolidColorBrush x:Key="PanelBrush"  Color="#E6101113"/>
+        <SolidColorBrush x:Key="LineBrush"   Color="#1AFFFFFF"/>
+        <SolidColorBrush x:Key="CtlBg"       Color="#0DFFFFFF"/>
+        <SolidColorBrush x:Key="CtlHover"    Color="#22FFFFFF"/>
+
+        <Style x:Key="CtlButton" TargetType="Button">
+            <Setter Property="Foreground" Value="{StaticResource TextBrush}"/>
+            <Setter Property="FontFamily" Value="Consolas"/>
+            <Setter Property="FontSize" Value="12.5"/>
+            <Setter Property="Padding" Value="10,5"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="HorizontalContentAlignment" Value="Center"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="Bd" Background="{StaticResource CtlBg}"
+                                BorderBrush="{StaticResource LineBrush}" BorderThickness="1"
+                                CornerRadius="6" Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                              VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Bd" Property="Background" Value="{StaticResource CtlHover}"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="CtlToggle" TargetType="ToggleButton">
+            <Setter Property="Foreground" Value="{StaticResource TextBrush}"/>
+            <Setter Property="FontFamily" Value="Consolas"/>
+            <Setter Property="FontSize" Value="12.5"/>
+            <Setter Property="Padding" Value="10,5"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="HorizontalContentAlignment" Value="Center"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ToggleButton">
+                        <Border x:Name="Bd" Background="{StaticResource CtlBg}"
+                                BorderBrush="{StaticResource LineBrush}" BorderThickness="1"
+                                CornerRadius="6" Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                              VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Bd" Property="Background" Value="{StaticResource CtlHover}"/>
+                            </Trigger>
+                            <Trigger Property="IsChecked" Value="True">
+                                <Setter TargetName="Bd" Property="Background" Value="{StaticResource AccentBrush}"/>
+                                <Setter TargetName="Bd" Property="BorderBrush" Value="{StaticResource AccentBrush}"/>
+                                <Setter Property="Foreground" Value="{StaticResource AccentInk}"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- always-amber toggle (hamburger button) -->
+        <Style x:Key="MenuHamburger" TargetType="ToggleButton">
+            <Setter Property="Foreground" Value="{StaticResource AccentInk}"/>
+            <Setter Property="FontFamily" Value="Consolas"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="HorizontalContentAlignment" Value="Center"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ToggleButton">
+                        <Border x:Name="Bd" Background="{StaticResource AccentBrush}"
+                                BorderBrush="{StaticResource AccentBrush}" BorderThickness="1"
+                                CornerRadius="6" Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Bd" Property="Background" Value="#FFC876"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- vertical menu variants: full width, left-aligned text -->
+        <Style x:Key="MenuBtnStyle" TargetType="Button" BasedOn="{StaticResource CtlButton}">
+            <Setter Property="Margin" Value="0,3,0,0"/>
+            <Setter Property="Padding" Value="10,6"/>
+            <Setter Property="HorizontalContentAlignment" Value="Left"/>
+        </Style>
+        <Style x:Key="MenuTglStyle" TargetType="ToggleButton" BasedOn="{StaticResource CtlToggle}">
+            <Setter Property="Margin" Value="0,3,0,0"/>
+            <Setter Property="Padding" Value="10,6"/>
+            <Setter Property="HorizontalContentAlignment" Value="Left"/>
+        </Style>
+        <Style x:Key="MenuCombo" TargetType="ComboBox">
+            <Setter Property="FontFamily" Value="Consolas"/>
+            <Setter Property="FontSize" Value="12.5"/>
+            <Setter Property="Margin" Value="0,3,0,0"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+        </Style>
+        <Style x:Key="Caption" TargetType="TextBlock">
+            <Setter Property="Foreground" Value="{StaticResource DimBrush}"/>
+            <Setter Property="FontFamily" Value="Consolas"/>
+            <Setter Property="FontSize" Value="10.5"/>
+            <Setter Property="Margin" Value="2,10,0,2"/>
+        </Style>        <Style TargetType="ContextMenu">
+            <Setter Property="Background" Value="{StaticResource PanelBrush}"/>
+            <Setter Property="BorderBrush" Value="{StaticResource LineBrush}"/>
+            <Setter Property="Foreground" Value="{StaticResource TextBrush}"/>
+        </Style>
+        <Style TargetType="MenuItem">
+            <Setter Property="Foreground" Value="{StaticResource TextBrush}"/>
+            <Setter Property="FontFamily" Value="Consolas"/>
+            <Setter Property="FontSize" Value="12.5"/>
+            <Setter Property="Padding" Value="8,4"/>
+        </Style>
+
+        <!-- title-bar caption buttons (minimize / maximize) -->
+        <Style x:Key="CaptionBtn" TargetType="Button">
+            <Setter Property="Width" Value="30"/>
+            <Setter Property="Height" Value="30"/>
+            <Setter Property="Foreground" Value="{StaticResource TextBrush}"/>
+            <Setter Property="FontFamily" Value="Segoe UI Symbol"/>
+            <Setter Property="FontSize" Value="11"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="Cb" Background="Transparent">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Cb" Property="Background" Value="#33FFFFFF"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+    </Window.Resources>
+
+    <Grid x:Name="Root" Background="Transparent"
+          MouseMove="Root_MouseMove">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <!-- custom title bar (hidden when Frameless is on) -->
+        <Border x:Name="TitleBar" Grid.Row="0" Height="30" Background="#FF000000"
+                MouseLeftButtonDown="TitleBar_MouseLeftButtonDown">
+            <Grid>
+                <TextBlock Text="CamView" VerticalAlignment="Center" Margin="10,0,0,0"
+                           FontFamily="Consolas" FontSize="12"
+                           Foreground="{StaticResource TextBrush}"/>
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                    <Button Content="&#x2500;" Style="{StaticResource CaptionBtn}"
+                            Click="Minimize_Click" ToolTip="Minimize"/>
+                    <Button x:Name="MaxBtn" Content="&#x25A1;" Style="{StaticResource CaptionBtn}"
+                            Click="MaxRestore_Click" ToolTip="Maximize"/>
+                    <Button Content="&#x2715;" Width="30" Height="30"
+                            Foreground="{StaticResource TextBrush}" Cursor="Hand"
+                            Click="Quit_Click" ToolTip="Close">
+                        <Button.Template>
+                            <ControlTemplate TargetType="Button">
+                                <Border x:Name="Cb" Background="Transparent">
+                                    <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                </Border>
+                                <ControlTemplate.Triggers>
+                                    <Trigger Property="IsMouseOver" Value="True">
+                                        <Setter TargetName="Cb" Property="Background" Value="#E81123"/>
+                                    </Trigger>
+                                </ControlTemplate.Triggers>
+                            </ControlTemplate>
+                        </Button.Template>
+                    </Button>
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <Grid Grid.Row="1" MouseLeftButtonDown="Root_MouseLeftButtonDown"
+              MouseRightButtonUp="Root_MouseRightButtonUp">
+
+        <!-- video layer: black backing + frame, faded together by the opacity slider -->
+        <Grid x:Name="VideoLayer">
+            <Rectangle Fill="Black"/>
+            <Image x:Name="VideoImage" Stretch="Uniform"
+                   RenderTransformOrigin="0.5,0.5" RenderOptions.BitmapScalingMode="LowQuality">
+                <Image.LayoutTransform>
+                    <RotateTransform x:Name="RotTf" Angle="0"/>
+                </Image.LayoutTransform>
+                <Image.RenderTransform>
+                    <ScaleTransform x:Name="FlipTf" ScaleX="1" ScaleY="1"/>
+                </Image.RenderTransform>
+            </Image>
+        </Grid>
+
+        <!-- top-left: stats, hamburger, vertical menu -->
+        <Grid HorizontalAlignment="Left" VerticalAlignment="Stretch" Margin="12,10,12,12">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+
+            <TextBlock x:Name="Osd" Grid.Row="0"
+                       FontFamily="Consolas" FontSize="12"
+                       Foreground="{StaticResource AccentBrush}" IsHitTestVisible="False">
+                <TextBlock.Effect>
+                    <DropShadowEffect ShadowDepth="1" BlurRadius="3" Opacity="0.8"/>
+                </TextBlock.Effect>
+            </TextBlock>
+
+            <ToggleButton x:Name="MenuTgl" Grid.Row="1" Style="{StaticResource MenuHamburger}"
+                          Content="&#x2630;" FontFamily="Segoe UI Symbol" FontSize="14"
+                          Width="38" Margin="0,8,0,0" HorizontalAlignment="Left"
+                          Click="MenuTgl_Click"/>
+
+            <Border x:Name="MenuPanel" Grid.Row="2" Visibility="Collapsed"
+                    Margin="0,6,0,0" Padding="10" CornerRadius="10" Width="200"
+                    HorizontalAlignment="Left" VerticalAlignment="Top"
+                    Background="{StaticResource PanelBrush}"
+                    BorderBrush="{StaticResource LineBrush}" BorderThickness="1">
+                <ScrollViewer VerticalScrollBarVisibility="Auto">
+                    <StackPanel>
+
+                        <TextBlock Style="{StaticResource Caption}" Text="CAMERA" Margin="2,0,0,2"/>
+                        <ComboBox x:Name="CamSel" Style="{StaticResource MenuCombo}"
+                                  SelectionChanged="CamSel_SelectionChanged"/>
+
+                        <TextBlock Style="{StaticResource Caption}" Text="IMAGE"/>
+                        <ToggleButton x:Name="FlipHTgl" Style="{StaticResource MenuTglStyle}" Content="Flip H"
+                                      Click="FlipH_Click"/>
+                        <ToggleButton x:Name="FlipVTgl" Style="{StaticResource MenuTglStyle}" Content="Flip V"
+                                      Click="FlipV_Click"/>
+                        <Button Style="{StaticResource MenuBtnStyle}" Content="Rotate 90&#xB0;"
+                                Click="Rotate_Click"/>
+
+                        <TextBlock Style="{StaticResource Caption}" Text="PERFORMANCE"/>
+                        <ComboBox x:Name="FpsSel" Style="{StaticResource MenuCombo}"
+                                 
+                                  SelectionChanged="FpsSel_SelectionChanged"/>
+                        <ComboBox x:Name="ResSel" Style="{StaticResource MenuCombo}"
+                                 
+                                  SelectionChanged="ResSel_SelectionChanged"/>
+
+                        <TextBlock Style="{StaticResource Caption}" Text="WINDOW"/>
+                        <Button Style="{StaticResource MenuBtnStyle}" Content="Fullscreen"
+                                Click="Full_Click"/>
+                        <ToggleButton x:Name="FramelessTgl" Style="{StaticResource MenuTglStyle}" Content="Frameless"
+                                      Click="Frameless_Click"/>
+                        <ToggleButton x:Name="TopTgl" Style="{StaticResource MenuTglStyle}" Content="Always on top"
+                                      Click="Top_Click"/>
+                        <ToggleButton x:Name="AspectTgl" Style="{StaticResource MenuTglStyle}" Content="Lock aspect ratio"
+                                      Click="Aspect_Click"/>
+                        <Button Style="{StaticResource MenuBtnStyle}" Content="Hide UI"
+                                Click="HideUi_Click"/>
+
+                        <TextBlock Style="{StaticResource Caption}" Text="OPACITY"/>
+                        <Grid Margin="0,3,0,0">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <Slider x:Name="OpacitySld" Minimum="1" Maximum="100" Value="100"
+                                    IsSnapToTickEnabled="True" TickFrequency="1"
+                                    VerticalAlignment="Center"
+                                    ValueChanged="OpacitySld_ValueChanged"/>
+                            <TextBlock x:Name="OpacityLbl" Grid.Column="1" Margin="8,0,2,0"
+                                       FontFamily="Consolas" FontSize="12" Width="28"
+                                       TextAlignment="Right" VerticalAlignment="Center"
+                                       Foreground="{StaticResource TextBrush}" Text="100"/>
+                        </Grid>
+
+                        <TextBlock Style="{StaticResource Caption}" Text="STARTUP"/>
+                        <ToggleButton x:Name="BootTgl" Style="{StaticResource MenuTglStyle}" Content="Run at login"
+                                      Click="Boot_Click"/>
+
+                        <TextBlock Style="{StaticResource Caption}" Text="APP"/>
+                        <Button Style="{StaticResource MenuBtnStyle}" Content="Quit"
+                                Click="Quit_Click"/>
+
+                    </StackPanel>
+                </ScrollViewer>
+            </Border>
+        </Grid>
+
+        <!-- toast -->
+        <Border x:Name="Toast" HorizontalAlignment="Center" VerticalAlignment="Bottom"
+                Margin="0,0,0,24" Padding="12,6" CornerRadius="7"
+                Background="{StaticResource PanelBrush}"
+                BorderBrush="{StaticResource LineBrush}" BorderThickness="1"
+                Visibility="Collapsed" IsHitTestVisible="False">
+            <TextBlock x:Name="ToastText" FontFamily="Consolas" FontSize="12.5"
+                       Foreground="{StaticResource TextBrush}"/>
+        </Border>
+
+        <!-- error panel -->
+        <StackPanel x:Name="ErrorPanel" HorizontalAlignment="Center" VerticalAlignment="Center"
+                    Visibility="Collapsed">
+            <TextBlock Text="Camera unavailable" FontSize="16" FontWeight="SemiBold"
+                       Foreground="{StaticResource TextBrush}" HorizontalAlignment="Center"/>
+            <TextBlock x:Name="ErrorText" MaxWidth="420" Margin="0,8,0,14" TextWrapping="Wrap"
+                       FontSize="13" Foreground="{StaticResource DimBrush}"
+                       HorizontalAlignment="Center" TextAlignment="Center"/>
+            <Button Style="{StaticResource CtlButton}" Content="Try again"
+                    HorizontalAlignment="Center" Padding="16,8" Click="Retry_Click"/>
+        </StackPanel>
+        </Grid>
+    </Grid>
+</Window>
